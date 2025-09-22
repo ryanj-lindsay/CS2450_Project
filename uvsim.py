@@ -26,13 +26,14 @@ class UVSim:
   #Default input/output functions
   def _default_input(self):
     while True:
-      value = int(input("Enter a word (-9999..9999): "))
-      if -9999 <= value <= 9999:
-        return value
-      print("Out of range. Please try again.")
+      try:
+        value = int(input("Enter a word (-9999..9999): "))
+        if -9999 <= value <= 9999:
+          return value
+        print("Out of range. Please try again.")
 
-    except ValueError:
-      print("Invalid input. Input must be an integer.")
+      except ValueError:
+        print("Invalid input. Input must be an integer.")
 
   def _default_output(self, value):
     print(value)
@@ -93,16 +94,22 @@ class UVSim:
       
     #BRANCH
     elif opcode == 40:
-      pass
+      self.instruction_pointer = operand
+      return
     #BRANCHNEG
     elif opcode == 41:
-      pass
+      if self.accumulator < 0:
+        self.instruction_pointer = operand
+        return
     #BRANCHZERO
     elif opcode == 42:
-      pass
+      if self.accumulator == 0:
+        self.instruction_pointer = operand
+        return
     #HALT
     elif opcode == 43:
-      pass
+      self.running = False
+      return
     #Every other opcode not listed
     else:
       raise RuntimeError(f"Invalid opcode: {opcode}")
