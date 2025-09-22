@@ -8,7 +8,7 @@ def test_add():
   sim.load([2000, 3001, 4300])
   sim.run()
 
-assert sim.accumulator == 15
+  assert sim.accumulator == 15
 
 def test_subtract():
   sim = UVSim()
