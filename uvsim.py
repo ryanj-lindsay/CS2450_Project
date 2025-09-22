@@ -65,25 +65,32 @@ class UVSim:
       self.set_memory(operand, value)
     #WRITE
     elif opcode == 11:
-      pass
+      value = self.get_memory(operand)
+      self.output_function(value)
+      
     #LOAD
     elif opcode == 20:
-      pass
+      self.accumulator = self.get_memory(operand)
     #STORE
     elif opcode == 21:
-      pass
+      self.set_memory(operand, self.accumulator)
+      
     #ADD
     elif opcode == 30:
-      pass
+      self.accumulator += self.get_memory(operand)
     #SUBTRACT
     elif opcode == 31:
-      pass
+      self.accumulator -= self.get_memory(operand)
     #DIVIDE
     elif opcode == 32:
-      pass
+      divisor = self.get_memory(operand)
+      if divisor == 0:
+        raise ZeroDivisionError("Division by zero.")
+      self.accumulator //= divisor
     #MULTIPLY
     elif opcode == 33:
-      pass
+      self.accumulator *= self.get_memory(operand)
+      
     #BRANCH
     elif opcode == 40:
       pass
