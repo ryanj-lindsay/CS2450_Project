@@ -13,7 +13,7 @@ class UVSim:
     if not (0 <= address < 100):
       raise IndexError(f"Invalid memory address: {address}")
     if not (-9999 <= value <= 9999):
-      raise ValueError("Value out of range (-9999..9999)")
+      raise ValueError("Value out of range (-9999 - 9999)")
       
     self.memory[address] = value
 
@@ -27,7 +27,7 @@ class UVSim:
   def _default_input(self):
     while True:
       try:
-        value = int(input("Enter a word (-9999..9999): "))
+        value = int(input("Enter a word (-9999 - 9999): "))
         if -9999 <= value <= 9999:
           return value
         print("Out of range. Please try again.")
