@@ -1,0 +1,16 @@
+Test_Name,Description,Use_Case,Inputs,Expected_Outputs,Success_Criteria
+test_read_test1,Tests READ method for Test1.txt.,READ (10),"5, 7","Memory[7] = 5, Memory[8] = 7",Passes if memory contains correct values
+test_write_test1,Tests WRITE method for Test1.txt.,WRITE (11),Memory from Test1.txt,Last output = Memory[9],Passes if last output matches expected memory value
+test_read_test2,Tests READ method for Test2.txt.,READ (10),"9, 3","Memory[9] = 9, Memory[10] = 3",Passes if memory contains correct values
+test_write_test2,Tests WRITE method for Test2.txt.,WRITE (11),Memory from Test2.txt,"Memory[9], Memory[10]",Passes if last output matches expected memory value
+test_load,Tests LOAD method.,LOAD (20),Memory[0] = 123,Accumulator = 123,Passes if accumulator matches memory[0]
+test_store,Tests STORE method.,STORE (21),Accumulator = 456,Memory[1] = 456,Passes if memory[1] matches accumulator
+test_add,Tests ADD method.,ADD (30),"Memory[0] = 10, Memory[1] = 5",Accumulator = 15,Passes if accumlator == 15
+test_subtract,Tests SUBTRACT method.,SUBTRACT (31),"Memory[0] = 10, Memory[1] = 5",Accumulator = 5,Passes if accumlator == 5
+test_divide,Tests DIVIDE method.,DIVIDE (32),"Memory[0] = 12, Memory[1] = 4",Accumulator = 3,Passes if accumlator == 3
+test_divide_by_zero,Test_Divide_Bys ZERO method.,DIVIDE (32),"Memory[0] = 12, Memory[1] = 0",Exception,Passes if an exception is thrown
+test_multiply,Tests MULTIPLY method.,MULTIPLY (33),"Memory[0] = 3, Memory[1] = 4",Accumulator = 12,Passes if accumulator == 12
+test_branch,Tests BRANCH method.,BRANCH (40),Instruction pointer jump,Accumulator = 77,Passes if accumulator loads the correct memory value
+test_branchneg,Tests BRANCHNEG method.,BRANCHNEG (41),Accumulator = -5,Accumulator = 111,Passes if accumulator is updated after a branch occurs
+test_branchzero,Tests BRANCHZERO method.,BRANCHZERO (42),Accumulator = 0,Accumulator = 222,Passes if accumulator is updated after a branch occurs
+test_halt,Tests HALT method.,HALT (43),"Accumulator = 9, instructions left",Accumulator = 9,Passes if halted after execution and accumulator remains unchanged
