@@ -1,1 +1,5 @@
 __pycache__/uvsim.cpython-312.pyc
+tests/__pycache__/test_arithmetic.cpython-312-pytest-7.4.4.pyc
+tests/__pycache__/test_control.cpython-312-pytest-7.4.4.pyc
+tests/__pycache__/test_io.cpython-312-pytest-7.4.4.pyc
+tests/__pycache__/test_load_store.cpython-312-pytest-7.4.4.pyc
