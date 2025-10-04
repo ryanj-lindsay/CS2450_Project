@@ -91,10 +91,12 @@ class UVSim:
         if opcode == 10:
             value = self.input_function()
             self.set_memory(operand, value)
+            self.instruction_pointer += 1
         #WRITE
         elif opcode == 11:
             value = self.get_memory(operand)
             self.output_function(value)
+            self.instruction_pointer += 1
         #LOAD
         elif opcode == 20:
             if not (0 <= operand < 100):
@@ -131,12 +133,16 @@ class UVSim:
         elif opcode == 41:
             if self.accumulator < 0:
                 self.instruction_pointer = operand
-                return
+            else:
+                self.instruction_pointer += 1
+            return
         #BRANCHZERO
         elif opcode == 42:
             if self.accumulator == 0:
                 self.instruction_pointer = operand
-                return
+            else:
+                self.instruction_pointer += 1
+            return
         #HALT
         elif opcode == 43:
             self.running = False
