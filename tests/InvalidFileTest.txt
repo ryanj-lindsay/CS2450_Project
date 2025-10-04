@@ -1,0 +1,1 @@
+This should give an error when attempting to load into the sim. If you are getting an error this test has worked correctly!

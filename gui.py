@@ -11,6 +11,9 @@ class UVSimGUI:
         self.output_screen = scrolledtext.ScrolledText(root, wrap=tk.WORD, font=("Courier", 14))
         self.output_screen.pack(expand=True, fill="both", padx=5, pady=5)
         
+        self.output_screen.insert(tk.END, "Click 'Upload' to upload a text file with BasicML commands to start.\n")
+        self.output_screen.see(tk.END)
+        
         # Bottom frame for user input
         bottom_frame = tk.Frame(root)
         bottom_frame.pack(side=tk.BOTTOM, fill=tk.X)
@@ -23,10 +26,12 @@ class UVSimGUI:
         self.upload_button = tk.Button(bottom_frame, text="Upload", command=self.upload_file, height=2)
         self.upload_button.pack(side=tk.RIGHT, padx=2)
         
-        self.enter_button = tk.Button(bottom_frame, text="Enter", command=self.handle_enter, height=2, width=8)
+        self.reset_button = tk.Button(bottom_frame, text="Reset", height=2, width=7, command=lambda: None)
+        self.reset_button.pack(side=tk.RIGHT, padx=2)
+        
+        self.enter_button = tk.Button(bottom_frame, text="Enter", command=self.handle_enter, height=2, width=7)
         self.enter_button.pack(side=tk.RIGHT, padx=2)
         
-        # Menu Bar with "Close"
         menubar = tk.Menu(root)
         filemenu = tk.Menu(menubar, tearoff=0)
         filemenu.add_command(label="Close", command=self.root.quit)
