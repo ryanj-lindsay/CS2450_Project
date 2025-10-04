@@ -14,3 +14,7 @@ test_branch,Tests BRANCH method.,BRANCH (40),Instruction pointer jump,Accumulato
 test_branchneg,Tests BRANCHNEG method.,BRANCHNEG (41),Accumulator = -5,Accumulator = 111,Passes if accumulator is updated after a branch occurs
 test_branchzero,Tests BRANCHZERO method.,BRANCHZERO (42),Accumulator = 0,Accumulator = 222,Passes if accumulator is updated after a branch occurs
 test_halt,Tests HALT method.,HALT (43),"Accumulator = 9, instructions left",Accumulator = 9,Passes if halted after execution and accumulator remains unchanged
+test_branchneg_no_branch, Tests that a negative-branch instruction does not branch when accumulator is positive,BRANCHNEG (41)," Memory[0]=5 Memory[1]=111 Instructions=[2000, 4104, 2001, 4300]", Accumulator=111, Execution continues without branching
+test_branchzero_no_branch, Tests that a zero-branch instruction does not branch when accumulator is nonzero,BRANCHZERO (42)," Memory[0]=7 Memory[1]=222 Instructions=[2000, 4204, 2001, 2001, 4300]", Accumulator=222, Execution continues without branching
+test_add_overflow, Tests that addition handles overflow correctly,ADD (30)," Memory[0]=9999 Memory[1]=1 Instructions=[2000, 3001, 4300]", Accumulator=-9999, Value truncated correctly to word size
+test_multiply_overflow, Tests that multiplication handles overflow correctly,MULTIPLY (33)," Memory[0]=5000 Memory[1]=3 Instructions=[2000, 3301, 4300]", Accumulator=5000, Value truncated correctly to word size
