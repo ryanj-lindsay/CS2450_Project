@@ -71,7 +71,7 @@ class UVSimGUI:
         self.reset_button.pack(side=tk.RIGHT, padx=2)
         
         self.enter_button = tk.Button(
-            bottom_frame, text="Enter", command=self.handle_enter(), 
+            bottom_frame, text="Enter", command=self.handle_enter, 
             height=2, width=7, bg=self.off_color, fg=self.primary_color
         )
         self.enter_button.pack(side=tk.RIGHT, padx=2)
