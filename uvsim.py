@@ -1,95 +1,152 @@
-memory = [0] * 100
-math_memory = 0
-instructions_counter = 0
-working = False
+import re
 
+class UVSim:
+    
+    #Class initialization
+    def __init__(self, input_function = None, output_function = None):
+        self.memory = [0] * 100
+        self.accumulator = 0
+        self.instruction_pointer = 0
+        self.running = False
+        self.input_function = input_function or self._default_input
+        self.output_function = output_function or self._default_output
 
-# this part of the sim is to read what is in the txt file
-def read(txtfile):
-    global memory
-    print(f"Reading program instructions from {txtfile}")
-    try:
-        with open(txtfile, 'r') as file:
-            position = 0
-            for line in file:
-                line = line.strip()
-                if line == "":
-                    continue
+    #Memory helper functions
+    def set_memory(self, address, value):
+        if not (0 <= address < 100):
+            raise IndexError(f"Invalid memory address: {address}")
+        if not (-9999 <= value <= 9999):
+            raise ValueError("Value out of range (-9999 - 9999)")
+      
+        self.memory[address] = value
 
-                try:
-                    number = int(line.replace("+", ""))
-                    memory[position] = number
-                    position += 1
-                except ValueError:
-                    print("Error: File command written wrong")
-                    return False
+    def get_memory(self, address):
+        if not (0 <= address < 100):
+            raise IndexError(f"Invalid memory address: {address}")
+      
+        return self.memory[address]
+        
+    #Method for truncating
+    @staticmethod
+    def _truncate_to_word(value):
+        sign = -1 if value < 0 else 1
+        low4 = abs(int(value)) % 10000
+        return sign * low4
 
-        print(f"Loaded {position} instructions")
-        return True
+    #Default input/output functions
+    def _default_input(self):
+        while True:
+            try:
+                value = int(input("Enter a word (-9999 - 9999): "))
+                if -9999 <= value <= 9999:
+                    return value
+                print("Out of range. Please try again.")
 
-    except FileNotFoundError:
-        print("Could not find file")
-        return False
+            except ValueError:
+                print("Invalid input. Input must be an integer.")
 
+    def _default_output(self, value):
+        print(value)
 
-# this section is to clean up the look of the numbers to match what is expected
-def clean_numbers(num):
-    if num >= 0:
-        return f"+{num:04d}"   
-    else:
-        return f"{num:05d}"   
+    #Program loading function    
+    def load(self, lines):
+        self.memory = [0] * 100
+        self.accumulator = 0
+        self.instruction_pointer = 0
+        for i, raw in enumerate(lines):
+            if i >= 100:
+                raise IndexError("Input too large.")
+            if isinstance(raw, str):
+                s = raw.strip()
+                if s == "":
+                    value = 0
+                else:
+                    m = re.fullmatch(r'([+-])?(\d{1,4})', s)
+                    if not m:
+                        raise ValueError(
+                            f"Malformed word at input line {i+1}: '{raw.strip()}'. "
+                            "Expected optional sign and 1–4 digits (e.g. +1234 or 0123)."
+                        )
+                    sign, digits = m.groups()
+                    num = int(digits)
+                    if sign == '-':
+                        num = -num
+                    value = num
+            elif isinstance(raw, int):
+                value = raw
+            else:
+                raise TypeError(f"Unsupported line type at index {i}: {type(raw).__name__}")
+            self.set_memory(i, value)
 
+    #Execution functions based on line input
+    def run(self): 
+        self.running = True
+        while self.running:
+            instruction = self.get_memory(self.instruction_pointer)
+            opcode, operand = divmod(instruction, 100)
+            self._execute(opcode, operand)
 
-def user_input(location):
-    global memory
-
-    print("Enter number: ", end="")
-    input_from_user = input()
-
-    try:
-        number = int(input_from_user)
-        if -9999 <= number <= 9999:
-            memory[location] = number
-            print(f"Stored {clean_numbers(number)} in memory[{location:02d}]")
-            return True
+    def _execute(self, opcode, operand):
+        #READ
+        if opcode == 10:
+            value = self.input_function()
+            self.set_memory(operand, value)
+            self.instruction_pointer += 1
+        #WRITE
+        elif opcode == 11:
+            value = self.get_memory(operand)
+            self.output_function(value)
+            self.instruction_pointer += 1
+        #LOAD
+        elif opcode == 20:
+            if not (0 <= operand < 100):
+                raise IndexError(f"Invalid memory access: {operand}")
+            self.accumulator = self.get_memory(operand)
+            self.instruction_pointer += 1
+        #STORE
+        elif opcode == 21:
+            self.set_memory(operand, self.accumulator)
+            self.instruction_pointer += 1
+        #ADD
+        elif opcode == 30:
+            self.accumulator = self._truncate_to_word(self.accumulator + self.get_memory(operand))
+            self.instruction_pointer += 1
+        #SUBTRACT
+        elif opcode == 31:
+            self.accumulator = self._truncate_to_word(self.accumulator - self.get_memory(operand))
+            self.instruction_pointer += 1
+        #DIVIDE
+        elif opcode == 32:
+            if self.get_memory(operand) == 0:
+                raise ZeroDivisionError("Division by zero.")
+            self.accumulator = self._truncate_to_word(self.accumulator // self.get_memory(operand))
+            self.instruction_pointer += 1
+        #MULTIPLY
+        elif opcode == 33:
+            self.accumulator = self._truncate_to_word(self.accumulator * self.get_memory(operand))
+            self.instruction_pointer += 1
+        #BRANCH
+        elif opcode == 40:
+            self.instruction_pointer = operand
+            return
+        #BRANCHNEG
+        elif opcode == 41:
+            if self.accumulator < 0:
+                self.instruction_pointer = operand
+            else:
+                self.instruction_pointer += 1
+            return
+        #BRANCHZERO
+        elif opcode == 42:
+            if self.accumulator == 0:
+                self.instruction_pointer = operand
+            else:
+                self.instruction_pointer += 1
+            return
+        #HALT
+        elif opcode == 43:
+            self.running = False
+            return
+        #Every other opcode not listed
         else:
-            print("Error number must be between limits -9999 and +9999")
-            return False
-    except ValueError:
-        print("Error: enter a valid number")
-        return False
-
-
-
-def output(location):
-    global memory
-    number = memory[location]
-    print(f"Output: {clean_numbers(number)}")
-
-
-def load_math_memory(location):
-    global math_memory, memory
-    math_memory = memory[location]
-    print(f"Loaded {math_memory} into math memory")
-
-def store_math_memory(location):
-    global math_memory, memory
-    memory[location] = math_memory
-    print(f"Stored {math_memory} into memory[{location:02d}]")
-
-
-# Operations that were are going to use for the sim
-
-def math_memory_add(location):
-    global math_memory, memory
-    original_num = math_memory
-    math_memory = math_memory + memory[location]
-    print(f"Numbers Added: {original_num} + {memory[location]} = {math_memory}")
-
-def math_memory_compare(location):
-    global math_memory, memory
-    original_num = math_memory
-    math_memory = math_memory - memory[location]
-    print(f"The bigger number is: {original_num} - {memory[location]} = {math_memory}")
-
-
+            raise RuntimeError(f"Invalid opcode: {opcode}")
