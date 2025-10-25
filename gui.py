@@ -45,6 +45,10 @@ class UVSimGUI:
         filemenu = tk.Menu(menubar, tearoff=0)
         filemenu.add_command(label="Close", command=self.root.quit)
         menubar.add_cascade(label="File", menu=filemenu)
+        
+        editmenu = tk.Menu(menubar, tearoff=0)
+        editmenu.add_command(label="Edit file", command=lambda: None)
+        menubar.add_cascade(label='Edit', menu=editmenu)
 
         # Theme menu
         thememenu = tk.Menu(menubar, tearoff=0)
@@ -54,10 +58,6 @@ class UVSimGUI:
         thememenu.add_command(label="Swap Colors", command=self.swap_colors)
         thememenu.add_command(label="Reset Default Theme", command=self.reset_theme)
         menubar.add_cascade(label="Theme", menu=thememenu)
-        
-        editmenu = tk.Menu(menubar, tearoff=0)
-        editmenu.add_command(label="Edit file", command=lambda: None)
-        menubar.add_cascade(label='Edit', menu=editmenu)
 
         self.root.config(menu=menubar)
 
