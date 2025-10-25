@@ -28,13 +28,12 @@ def main():
             self.sim = UVSim(input_function=self._gui_input, output_function=self._gui_output)
 
             self.enter_button.config(command=self._enter_click)
-            self.upload_button.config(command=self._upload_and_run)
+            self.run_button.config(command=self._run_from_editor)
 
             self._runner_thread = None
             self._running = False
             
             self.reset_button.config(command=self._reset)
-
 
         def _gui_output(self, value):
             self.root.after(0, lambda: self._append(str(value)))
@@ -58,7 +57,7 @@ def main():
         def _set_running(self, is_running: bool):
             self._running = is_running
             state = ("disabled" if is_running else "normal")
-            self.upload_button.config(state=state)
+            self.run_button.config(state=state)
             self.user_input.config(state="normal")
             self.enter_button.config(state="normal")
 
@@ -98,36 +97,41 @@ def main():
         def _enter_click(self):
             self.handle_enter()
 
-        def _upload_and_run(self):
-            from tkinter import filedialog, messagebox
-            file_path = filedialog.askopenfilename(
-                title="Select a BasicML program",
-                filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
-            )
-            if not file_path:
+        def _run_from_editor(self):
+            content = self.instruction_editor.get(1.0, tk.END)
+            lines = content.strip().split('\n')
+            instructions = []
+            
+            for line in lines:
+                if ':' in line:
+                    parts = line.split(':', 1)
+                    if len(parts) == 2:
+                        instruction = parts[1].strip()
+                        if instruction:
+                            instructions.append(instruction)
+            
+            if not instructions:
+                messagebox.showwarning("No Program", "Load or enter instructions first.")
                 return
-
+            
             self._stop_if_running()
-
+            
             import queue
             self._inbox = queue.Queue()
-
+            
             try:
-                with open(file_path, "r") as f:
-                    lines = [line.strip() for line in f if line.strip()]
-                self.sim = UVSim( 
+                self.sim = UVSim(
                     input_function=self._gui_input,
                     output_function=self._gui_output
                 )
-                self.sim.load(lines)
+                self.sim.load(instructions)
             except Exception as e:
                 messagebox.showerror("Load Error", f"{e}")
                 return
-
-            self._append(f"[Program loaded: {file_path}]")
-            self._append("[Running…]")
+            
+            self._append("[Running program from editor…]")
             self._set_running(True)
-
+            
             import threading
             def _run():
                 try:
@@ -141,15 +145,13 @@ def main():
                     self._gui_output(f"Unexpected error: {e}")
                 finally:
                     self.root.after(0, lambda: self._set_running(False))
-
+            
             self._runner_thread = threading.Thread(target=_run, daemon=True)
             self._runner_thread.start()
-
 
     root = tk.Tk()
     app = GUIRunner(root)
     root.mainloop()
-
 
 if __name__ == "__main__":
     main()
