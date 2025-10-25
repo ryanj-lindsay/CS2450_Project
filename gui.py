@@ -52,8 +52,8 @@ class UVSimGUI:
 
         # Theme menu
         thememenu = tk.Menu(menubar, tearoff=0)
-        thememenu.add_command(label="Set Primary Color…", command=self.choose_primary)
-        thememenu.add_command(label="Set Off Color…", command=self.choose_off)
+        thememenu.add_command(label="Set Primary Color…", command=self.choose_off)
+        thememenu.add_command(label="Set Off Color…", command=self.choose_primary)
         thememenu.add_separator()
         thememenu.add_command(label="Swap Colors", command=self.swap_colors)
         thememenu.add_command(label="Reset Default Theme", command=self.reset_theme)
@@ -116,7 +116,7 @@ class UVSimGUI:
             self.root.option_add("*Menu.activeForeground", "#FFFFFF")
         except Exception:
             pass
-
+        
     def choose_primary(self):
         color_tuple = colorchooser.askcolor(title="Choose Primary Color", initialcolor=self.theme["primary"])
         if color_tuple and color_tuple[1]:
@@ -134,8 +134,8 @@ class UVSimGUI:
         self.apply_theme()
 
     def reset_theme(self):
-        self.theme["primary"] = rgb_to_hex(76, 114, 29)   # #4C721D
-        self.theme["off"] = rgb_to_hex(255, 255, 255)     # white
+        self.theme["primary"] = rgb_to_hex(76, 114, 29)
+        self.theme["off"] = rgb_to_hex(255, 255, 255)
         self.apply_theme()
 
     def handle_enter(self, event=None):
