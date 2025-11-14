@@ -22,7 +22,7 @@ class UVSimGUI:
         left_frame = tk.Frame(main_frame, bg=self.primary_color)
         left_frame.pack(side=tk.LEFT, expand=True, fill="both", padx=(0, 5))
         
-        tk.Label(left_frame, text="Program Instructions (00-99)", 
+        tk.Label(left_frame, text="Program Instructions (000-249)", 
                  font=("Courier", 12, "bold"), bg=self.primary_color, 
                  fg=self.off_color).pack()
         
@@ -45,8 +45,8 @@ class UVSimGUI:
         self.output_screen.pack(expand=True, fill="both")
         
         self.output_screen.insert(tk.END, "Welcome to UVsim!\n")
-        self.output_screen.insert(tk.END, "Click 'File > Open' to load a BasicML file.\n")
-        self.output_screen.insert(tk.END, "Edit the instructions, then click 'Run' to execute.\n")
+        self.output_screen.insert(tk.END, "Click 'File -> Open' to load a BasicML file.\n")
+        self.output_screen.insert(tk.END, "Once loaded you may edit the instructions, then click 'Run' to execute.\n")
         self.output_screen.see(tk.END)
         
         bottom_frame = tk.Frame(root, bg=self.primary_color)

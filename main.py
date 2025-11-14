@@ -77,7 +77,7 @@ def main():
             self.sim = UVSim(input_function=self._gui_input, output_function=self._gui_output)
             self.output_screen.delete("1.0", tk.END)
             self.user_input.delete(0, tk.END)
-            self.output_screen.insert(tk.END, "Click 'Upload' to upload a text file with BasicML commands to start.\n")
+            self.output_screen.insert(tk.END, "Click 'File -> Open' to upload a text file with BasicML commands to start.\n")
             self.output_screen.see(tk.END)
             self._set_running(False)
 
