@@ -9,7 +9,7 @@ class UVSim:
         self.running = False
         self.input_function = input_function or self._default_input
         self.output_function = output_function or self._default_output
-        self.format = None  # 4 or 6 (digits)
+        self.format = None
 
     def _max_word(self):
         return 9999 if self.format == 4 else 999999
@@ -39,11 +39,11 @@ class UVSim:
     def _default_input(self):
         while True:
             try:
-                raw = int(input("Enter a word: "))
                 limit = self._max_word()
+                raw = int(input(f"Enter a word (-{limit} to {limit}): "))
                 if -limit <= raw <= limit:
                     return raw
-                print(f"Out of range. Enter between {-limit} and {limit}.")
+                print(f"Out of range. Enter between -{limit} and {limit}.")
             except ValueError:
                 print("Invalid input. Integer required.")
 
@@ -62,7 +62,6 @@ class UVSim:
                 s = raw.strip()
                 if s == "":
                     value = 0
-                    # leave fmt unchanged by blank lines
                 else:
                     if re.fullmatch(r'[+-]?\d{6}', s):
                         f = 6
@@ -80,11 +79,9 @@ class UVSim:
             else:
                 raise TypeError(f"Unsupported line type at index {i}: {type(raw).__name__}")
 
-            # set detected format before enforcing per-line limits
             if fmt is not None:
                 self.format = fmt
 
-            # enforce per-format bounds when loading numeric instruction/values
             if self.format == 4:
                 if not (-9999 <= value <= 9999):
                     raise ValueError(f"Value out of 4-digit range at line {i+1}: {value}")
@@ -95,7 +92,6 @@ class UVSim:
             self.set_memory(i, value)
 
         if self.format is None:
-            # empty file default to new (6-digit) format for behavior consistency
             self.format = 6
 
     def run(self):
@@ -117,57 +113,57 @@ class UVSim:
             self._execute(opcode, operand)
 
     def _execute(self, opcode, operand):
-        if opcode == 10:  # READ
+        if opcode == 10:
             value = self.input_function()
             self.set_memory(operand, int(value))
             self.instruction_pointer += 1
-        elif opcode == 11:  # WRITE
+        elif opcode == 11:
             value = self.get_memory(operand)
             self.output_function(value)
             self.instruction_pointer += 1
-        elif opcode == 20:  # LOAD
+        elif opcode == 20:
             if not (0 <= operand < self.MAX_MEM):
                 raise IndexError(f"Invalid memory access: {operand}")
             self.accumulator = self.get_memory(operand)
             self.instruction_pointer += 1
-        elif opcode == 21:  # STORE
+        elif opcode == 21:
             self.set_memory(operand, self.accumulator)
             self.instruction_pointer += 1
-        elif opcode == 30:  # ADD
+        elif opcode == 30:
             res = self.accumulator + self.get_memory(operand)
             self.accumulator = self._truncate_to_word(res)
             self.instruction_pointer += 1
-        elif opcode == 31:  # SUBTRACT
+        elif opcode == 31:
             res = self.accumulator - self.get_memory(operand)
             self.accumulator = self._truncate_to_word(res)
             self.instruction_pointer += 1
-        elif opcode == 32:  # DIVIDE
+        elif opcode == 32:
             denom = self.get_memory(operand)
             if denom == 0:
                 raise ZeroDivisionError("Division by zero.")
             res = self.accumulator // denom
             self.accumulator = self._truncate_to_word(res)
             self.instruction_pointer += 1
-        elif opcode == 33:  # MULTIPLY
+        elif opcode == 33:
             res = self.accumulator * self.get_memory(operand)
             self.accumulator = self._truncate_to_word(res)
             self.instruction_pointer += 1
-        elif opcode == 40:  # BRANCH
+        elif opcode == 40:
             self.instruction_pointer = operand
             return
-        elif opcode == 41:  # BRANCHNEG
+        elif opcode == 41:
             if self.accumulator < 0:
                 self.instruction_pointer = operand
             else:
                 self.instruction_pointer += 1
             return
-        elif opcode == 42:  # BRANCHZERO
+        elif opcode == 42:
             if self.accumulator == 0:
                 self.instruction_pointer = operand
             else:
                 self.instruction_pointer += 1
             return
-        elif opcode == 43:  # HALT
+        elif opcode == 43:
             self.running = False
             return
         else:
